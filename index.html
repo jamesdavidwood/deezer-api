@@ -43,11 +43,17 @@
   </button>
   </div>
     <div class="row">
-      <h1 id="artist_name"></h1>
+      <div class="col">
       <img id="artist_image"><img/>
     </div>
+    <div class="col">
+      <h1 id="artist_name"></h1>
+    </div>
+    </div>
     <!--"card-columns is a layout from bootstrap"  -->
+    <div class="row">
   <div class="card-columns" id="album_list"></div>
+</div>
 </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://e-cdns-files.dzcdn.net/js/min/dz.js"></script>
@@ -110,7 +116,7 @@
 
       // $("#track_list").html(response.data[0].tracklist);
       for (var i = 0; i < album_list.length; i++) {
-        $('#album_list').append('<div class="card" style="width: 250px;"><img src="'+album_list[i].cover_medium+'"/><h5 class="card-title">' + album_list[i].title + '</h5></div>');
+        $('#album_list').append('<div class="card border-secondary mb-3" style="width: 251px;"><img src="'+album_list[i].cover_medium+'"/><h5 class="card-title">' + album_list[i].title + '</h5></div>');
       }
     }
 
