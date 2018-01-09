@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+  <title>Deezer API</title>
+</head>
+
+
+<body>
+  <h1>Deezer API</h1>
+
+  <div id="dz-root"></div>
+  <form>
+    <input type="text"/>
+    <button>Search</button>
+  </form>
+  <h1 id="artist_name"></h1>
+  <img id="artist_image"><img/>
+  <div id="album_list"></div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://e-cdns-files.dzcdn.net/js/min/dz.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+  <script>
+    var artist_info;
+    var album_list;
+
+    function getArtistInfo(artist_name) {
+      return new Promise(function(resolve, reject) {
+        DZ.api("/search/artist?q="+artist_name+"&limit=1", function(response) {
+
+          if (response.data[0] == undefined) {
+            console.log("Error found");
+
+            $("#artist_image").attr("src", "https://i.imgur.com/2ga1TdQ.jpg");
+
+            clearArtistInfo();
+
+            // Print error message
+          }
+          else {
+            artist_info = response.data[0];
+            resolve();
+          }
+
+        });
+
+        setTimeout(function() { reject("artist information request connection timed out") }, 2500);
+      });
+    }
+
+    function getAlbumData() {
+      return new Promise(function(resolve, reject) {
+        DZ.api("/artist/"+artist_info.id+"/albums", function(response) {
+          console.log('got album data', response);
+          album_list = response.data;
+          resolve();
+        });
+
+        setTimeout(function() { reject("album data request connection timed out") }, 2500);
+      });
+    }
+
+    function clearArtistInfo() {
+
+      $('#album_list').html("");
+      $('#artist_name').html("");
+    }
+
+    function displayArtistInfo() {
+
+      // clear all <p>aragraphs before
+      clearArtistInfo();
+
+      $("#artist_name").html(artist_info.name);
+      $("#artist_image").attr("src", artist_info.picture_big);
+
+      // $("#track_list").html(response.data[0].tracklist);
+      for (var i = 0; i < album_list.length; i++) {
+        $('#album_list').append('<p>' + album_list[i].title + '</p>');
+      }
+    }
+
+    $("form").submit(function(event) {
+      event.preventDefault();
+      var artist = $('input').val();
+
+      getArtistInfo(artist).then(
+        function() {
+          return getAlbumData();
+        }
+      ).then(
+        function() {
+          displayArtistInfo();
+        }
+      ).catch(function(reason) {
+        console.log(reason);
+      });
+
+      // DZ.api("/search/artist?q="+artist+"&limit=1", function(response) {
+      //   console.log(response);
+      //   artist_info = response.data[0];
+      //   // for (var i=0 in response.data[0]) {
+      //   // console.log(response.data[0],response.data[0][i]); };
+      //   $("#artist_name").html(response.data[0].name);
+      //   $("img").attr("src", response.data[0].picture_big);
+      //   $("#track_list").html(response.data[0].tracklist);
+      //   // DZ.api("/search/album?q="+artist+"&limit=5", function(response) {
+      //   //   console.log(response);
+      //   // });
+      // });
+    });
+  </script>
+</body>
+</html>
