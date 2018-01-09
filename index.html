@@ -16,21 +16,20 @@
       <div class="col">
         <h1>Deezer API</h1>
       </div>
-      <div class="col">
-        <form>
-          <div class="form-inline">
-            <input class="form-control" type="text"/>
-            <button class="btn btn-primary">Search</button>
-          </div>
-        </form>
+    <div class="col">
+      <form>
+        <div class="form-inline">
+          <input class="form-control" type="text"/>
+          <button class="btn btn-primary">Search</button>
+        </div>
+      </form>
 
-      </div>
-</div>
+    </div>
+  </div>
     <div class="row">
       <h1 id="artist_name"></h1>
       <h1 id="error_message"></h1>
       <img id="artist_image"><img/>
-
     </div>
   <div class="card-columns" id="album_list"></div>
 </div>
@@ -81,7 +80,6 @@
     }
 // This fuction removes Artist Information on bad search.
     function clearArtistInfo() {
-
       $('#album_list').html("");
       $('#artist_name').html("");
       $('#error_message').html("");
