@@ -40,7 +40,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
   <script>
     var artist_info;
-    var album_list;
+    var album_list = [];
 
     function getArtistInfo(artist_name) {
       return new Promise(function(resolve, reject) {
@@ -69,9 +69,10 @@
 
     function getAlbumData() {
       return new Promise(function(resolve, reject) {
-        DZ.api("/artist/"+artist_info.id+"/albums", function(response) {
-          console.log('got album data', response);
-          album_list = response.data;
+        DZ.api("/artist/"+artist_info.id+"/albums?limit=200", function(response) {
+          album_list = album_list.concat(response.data);
+
+          // resolve final promise for the last set of albums
           resolve();
         });
 
@@ -109,7 +110,7 @@
           return getAlbumData();
         }
       ).then(
-        function() {
+        function(continueAlbumData) {
           displayArtistInfo();
         }
       ).catch(function(reason) {
