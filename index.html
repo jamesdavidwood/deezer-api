@@ -10,19 +10,30 @@
 
 
 <body>
-  <h1>Deezer API</h1>
+  <div class="container">
+    <div id="dz-root"></div>
+    <div class="row">
+      <div class="col">
+        <h1>Deezer API</h1>
+      </div>
+      <div class="col">
+        <form>
+          <div class="form-inline">
+            <input class="form-control" type="text"/>
+            <button class="btn btn-primary">Search</button>
+          </div>
+        </form>
 
-  <div id="dz-root"></div>
-  <form>
-    <div class="form-group">
-      <input class="form-control" type="text"/>
-      <button class="btn btn-primary">Search</button>
+      </div>
+</div>
+    <div class="row">
+      <h1 id="artist_name"></h1>
+      <h1 id="error_message"></h1>
+      <img id="artist_image"><img/>
+
     </div>
-  </form>
-  <h1 id="artist_name"></h1>
-  <h1 id="error_message"></h1>
-  <img id="artist_image"><img/>
   <div class="card-columns" id="album_list"></div>
+</div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://e-cdns-files.dzcdn.net/js/min/dz.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -67,13 +78,14 @@
         setTimeout(function() { reject("album data request connection timed out") }, 2500);
       });
     }
-
+// This fuction removes Artist Information on bad search.
     function clearArtistInfo() {
 
       $('#album_list').html("");
       $('#artist_name').html("");
+      $('#error_message').html("");
     }
-
+// This
     function displayArtistInfo() {
 
       // clear all <p>aragraphs before
@@ -84,7 +96,7 @@
 
       // $("#track_list").html(response.data[0].tracklist);
       for (var i = 0; i < album_list.length; i++) {
-        $('#album_list').append('<div class="card"><img src="'+album_list[i].cover_medium+'"/><p>' + album_list[i].title + '</p></div>');
+        $('#album_list').append('<div class="card"><img src="'+album_list[i].cover_medium+'"/><h5 class="card-title">' + album_list[i].title + '</h5></div>');
       }
     }
 
