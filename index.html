@@ -55,6 +55,7 @@
     var album_list = [];
     var album_tracks_received = 0;
 
+    // this function displays an error message, which is dismissable.
     function displayError(message) {
       error_block = '<div class="alert alert-danger alert-dismissible fade show" role="alert"> \
         <h4 id="error_message">'+message+'</h4> \
@@ -62,17 +63,21 @@
         <span aria-hidden="true">&times;</span> \
       </button> \
       </div>'
+      // it is appending our message to the message_block
       $("#error").append(error_block);
     }
 
+    // on a successful search this will clear all errors.
     function clearErrors() {
       $("#error").html("");
     }
 
+    // this function will retrieve infomation from the Deezer API
     function getArtistInfo(artist_name) {
       return new Promise(function(resolve, reject) {
         DZ.api("/search/artist?q="+artist_name+"&limit=1", function(response) {
 
+          // if i cannot find artist infomation it will display an error.
           if (response.data[0] == undefined) {
             displayError("Cannot find specified artist");
             $("#artist_image").attr("src", "no_artist_information.png");
@@ -94,7 +99,7 @@
 
     function updateTrackListings() {
       for (var i = 0; i < album_list.length; i++) {
-        //console.log(album_list[i].title);
+        //console.log(album_list[i].title); Old Console Debug, the "j" is used beause i is in use.
         for (var j = 0; j < album_list[i].tracks.length; j++) {
           //console.log(j, album_list[i].tracks[j].title);
           ol = $('#'+album_list[i].id).append('<li>'+album_list[i].tracks[j].title+'</li>');
