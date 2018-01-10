@@ -94,11 +94,11 @@
 
     function updateTrackListings() {
       for (var i = 0; i < album_list.length; i++) {
-        console.log(album_list[i].title);
+        //console.log(album_list[i].title);
         for (var j = 0; j < album_list[i].tracks.length; j++) {
-          console.log(j, album_list[i].tracks[j].title);
+          //console.log(j, album_list[i].tracks[j].title);
           ol = $('#'+album_list[i].id).append('<li>'+album_list[i].tracks[j].title+'</li>');
-          console.log(ol);
+          //console.log(ol);
         }
       }
     }
@@ -177,7 +177,7 @@
           displayArtistInfo();
         }
       ).catch(function(reason) {
-        console.log(reason);
+        //console.log(reason);
       });
 
       // DZ.api("/search/artist?q="+artist+"&limit=1", function(response) {
