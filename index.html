@@ -28,27 +28,19 @@
     </div>
   </div>
   <!--End div for heading including Title and Search Bar  -->
-  <!--Sucess Message  -->
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <p id="success_message"></p>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-  </div>
-  <!--Error Message  -->
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <h4 id="error_message"></h4>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-  </div>
+
+  <div id="error"></div>
+
     <div class="row">
       <div class="col">
       <img id="artist_image"><img/>
     </div>
     <div class="col">
       <h1 id="artist_name"></h1>
+
     </div>
+    </div>
+
     </div>
     <!--"card-columns is a layout from bootstrap"  -->
     <div class="row">
@@ -63,20 +55,33 @@
     var artist_info;
     var album_list = [];
 
+    function displayError(message) {
+      error_block = '<div class="alert alert-danger alert-dismissible fade show" role="alert"> \
+        <h4 id="error_message">'+message+'</h4> \
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"> \
+        <span aria-hidden="true">&times;</span> \
+      </button> \
+      </div>'
+      $("#error").append(error_block);
+    }
+
+    function clearErrors() {
+      $("#error").html("");
+    }
+
     function getArtistInfo(artist_name) {
       return new Promise(function(resolve, reject) {
         DZ.api("/search/artist?q="+artist_name+"&limit=1", function(response) {
 
           if (response.data[0] == undefined) {
-            console.log("Error found");
-            $("#error_message").html("Cannot be displayed due to an error!");
+            displayError("Cannot find specified artist");
             $("#artist_image").attr("src", "no_artist_information.png");
 
             clearArtistInfo();
 
-            // Print error message
           }
           else {
+            clearErrors();
             artist_info = response.data[0];
             resolve();
           }
@@ -90,7 +95,7 @@
     function getAlbumData() {
       return new Promise(function(resolve, reject) {
         DZ.api("/artist/"+artist_info.id+"/albums?limit=200", function(response) {
-          album_list = album_list.concat(response.data);
+          album_list = response.data;
 
           // resolve final promise for the last set of albums
           resolve();
@@ -103,14 +108,12 @@
     function clearArtistInfo() {
       $('#album_list').html("");
       $('#artist_name').html("");
-      $('#error_message').html("");
     }
 // This funtion display Artist Infomation on Success
     function displayArtistInfo() {
 
       // clear all <p>aragraphs before
       clearArtistInfo();
-      $("#success_message").html("SUCCESS! It Displayed Something!");
       $("#artist_name").html(artist_info.name);
       $("#artist_image").attr("src", artist_info.picture_big);
 
@@ -129,7 +132,7 @@
           return getAlbumData();
         }
       ).then(
-        function(continueAlbumData) {
+        function() {
           displayArtistInfo();
         }
       ).catch(function(reason) {
