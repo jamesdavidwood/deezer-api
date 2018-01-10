@@ -28,7 +28,6 @@
     </div>
   </div>
   <!--End div for heading including Title and Search Bar  -->
-
   <div id="error"></div>
 
     <div class="row">
@@ -54,6 +53,7 @@
   <script>
     var artist_info;
     var album_list = [];
+    var album_tracks_received = 0;
 
     function displayError(message) {
       error_block = '<div class="alert alert-danger alert-dismissible fade show" role="alert"> \
@@ -92,20 +92,61 @@
       });
     }
 
+    function updateTrackListings() {
+      for (var i = 0; i < album_list.length; i++) {
+        console.log(album_list[i].title);
+        for (var j = 0; j < album_list[i].tracks.length; j++) {
+          console.log(j, album_list[i].tracks[j].title);
+          ol = $('#'+album_list[i].id).append('<li>'+album_list[i].tracks[j].title+'</li>');
+          console.log(ol);
+        }
+      }
+    }
+
+// this function uses the Deezer API to retrieve data about Artist's Albums
     function getAlbumData() {
       return new Promise(function(resolve, reject) {
         DZ.api("/artist/"+artist_info.id+"/albums?limit=200", function(response) {
           album_list = response.data;
+          // console.log(response.data)
 
           // resolve final promise for the last set of albums
+          for (var i = 0; i < album_list.length; i++) {
+            setTimeout(function(i) {
+              // console.log(i);
+              getAlbumTracks(i, album_list[i].id).then(function() {
+                album_tracks_received++;
+
+                if ( album_tracks_received == album_list.length) {
+                  updateTrackListings();
+                }
+              });
+            }, 100 + (i * 100), i);
+          }
+
           resolve();
         });
 
         setTimeout(function() { reject("album data request connection timed out") }, 2500);
       });
     }
+    function getAlbumTracks(index, album_id){
+      return new Promise(function(resolve, reject) {
+        DZ.api("/album/"+album_id+"/tracks?limit=150", function(response) {
+          // album_track = response.data;
+          // console.log(response);
+
+          album_list[index].tracks = response.data;
+
+          resolve();
+        });
+        setTimeout(function() { reject("album track data request connection timed out") }, 2500);
+      });
+    }
+
 // This fuction removes Artist Information on bad search.
     function clearArtistInfo() {
+      album_tracks_received = 0;
       $('#album_list').html("");
       $('#artist_name').html("");
     }
@@ -119,7 +160,7 @@
 
       // $("#track_list").html(response.data[0].tracklist);
       for (var i = 0; i < album_list.length; i++) {
-        $('#album_list').append('<div class="card border-secondary mb-3" style="width: 251px;"><img src="'+album_list[i].cover_medium+'"/><h5 class="card-title">' + album_list[i].title + '</h5></div>');
+        $('#album_list').append('<div class="card border-secondary mb-3" style="width: 251px;"><img src="'+album_list[i].cover_medium+'"/><h5 class="card-title">' + album_list[i].title + '</h5><ol id="'+album_list[i].id+'"></ol></div>');
       }
     }
 
