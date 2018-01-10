@@ -1,10 +1,12 @@
 <!doctype html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <!-- the above line will make the site responsive  -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
   <title>Deezer API</title>
 </head>
 
@@ -14,38 +16,37 @@
   <div class="container">
     <div id="dz-root"></div>
     <div class="row">
-      <div class="col">
+      <div class="col-sm-6">
         <h1><a href="index.html">Deezer API</a></h1>
       </div>
-    <div class="col">
-      <form>
-        <div class="form-inline">
-          <input class="form-control" type="text"/>
-          <button class="btn btn-primary">Search</button>
-        </div>
-      </form>
-
+      <div class="col-sm-6">
+        <form>
+          <div class="form-inline">
+            <input class="form-control" type="text" />
+            <button class="btn btn-primary">Search</button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
-  <!--End div for heading including Title and Search Bar  -->
-  <div id="error"></div>
+    <!--End div for heading including Title and Search Bar  -->
+    <div id="error"></div>
 
+    <div class="row">
+      <div class="col-sm-6">
+        <img id="artist_image"><img/>
+      </div>
+      <div class="col-sm-6">
+        <h1 id="artist_name"></h1>
+      </div>
+    </div>
     <div class="row">
       <div class="col">
-      <img id="artist_image"><img/>
+        <div class="card-columns" id="album_list"></div>
+      </div>
     </div>
-    <div class="col">
-      <h1 id="artist_name"></h1>
+  </div>
+  <!--"card-columns is a layout from bootstrap"  -->
 
-    </div>
-    </div>
-
-    </div>
-    <!--"card-columns is a layout from bootstrap"  -->
-    <div class="row">
-  <div class="card-columns" id="album_list"></div>
-</div>
-</div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://e-cdns-files.dzcdn.net/js/min/dz.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -58,7 +59,8 @@
     // this function displays an error message, which is dismissable.
     function displayError(message) {
       error_block = '<div class="alert alert-danger alert-dismissible fade show" role="alert"> \
-        <h4 id="error_message">'+message+'</h4> \
+        <h4 id="error_message">' + message +
+        '</h4> \
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"> \
         <span aria-hidden="true">&times;</span> \
       </button> \
@@ -75,7 +77,7 @@
     // this function will retrieve infomation from the Deezer API
     function getArtistInfo(artist_name) {
       return new Promise(function(resolve, reject) {
-        DZ.api("/search/artist?q="+artist_name+"&limit=1", function(response) {
+        DZ.api("/search/artist?q=" + artist_name + "&limit=1", function(response) {
 
           // if i cannot find artist infomation it will display an error.
           if (response.data[0] == undefined) {
@@ -84,8 +86,7 @@
 
             clearArtistInfo();
 
-          }
-          else {
+          } else {
             clearErrors();
             artist_info = response.data[0];
             resolve();
@@ -93,7 +94,9 @@
 
         });
 
-        setTimeout(function() { reject("artist information request connection timed out") }, 2500);
+        setTimeout(function() {
+          reject("artist information request connection timed out")
+        }, 2500);
       });
     }
 
@@ -102,16 +105,16 @@
         //console.log(album_list[i].title); Old Console Debug, the "j" is used beause i is in use.
         for (var j = 0; j < album_list[i].tracks.length; j++) {
           //console.log(j, album_list[i].tracks[j].title);
-          ol = $('#'+album_list[i].id).append('<li>'+album_list[i].tracks[j].title+'</li>');
+          ol = $('#' + album_list[i].id).append('<li>' + album_list[i].tracks[j].title + '</li>');
           //console.log(ol);
         }
       }
     }
 
-// this function uses the Deezer API to retrieve data about Artist's Albums
+    // this function uses the Deezer API to retrieve data about Artist's Albums
     function getAlbumData() {
       return new Promise(function(resolve, reject) {
-        DZ.api("/artist/"+artist_info.id+"/albums?limit=200", function(response) {
+        DZ.api("/artist/" + artist_info.id + "/albums?limit=200", function(response) {
           album_list = response.data;
           // console.log(response.data)
 
@@ -122,7 +125,7 @@
               getAlbumTracks(i, album_list[i].id).then(function() {
                 album_tracks_received++;
 
-                if ( album_tracks_received == album_list.length) {
+                if (album_tracks_received == album_list.length) {
                   updateTrackListings();
                 }
               });
@@ -132,12 +135,15 @@
           resolve();
         });
 
-        setTimeout(function() { reject("album data request connection timed out") }, 2500);
+        setTimeout(function() {
+          reject("album data request connection timed out")
+        }, 2500);
       });
     }
-    function getAlbumTracks(index, album_id){
+
+    function getAlbumTracks(index, album_id) {
       return new Promise(function(resolve, reject) {
-        DZ.api("/album/"+album_id+"/tracks?limit=150", function(response) {
+        DZ.api("/album/" + album_id + "/tracks?limit=150", function(response) {
           // album_track = response.data;
           // console.log(response);
 
@@ -145,17 +151,19 @@
 
           resolve();
         });
-        setTimeout(function() { reject("album track data request connection timed out") }, 2500);
+        setTimeout(function() {
+          reject("album track data request connection timed out")
+        }, 2500);
       });
     }
 
-// This fuction removes Artist Information on bad search.
+    // This fuction removes Artist Information on bad search.
     function clearArtistInfo() {
       album_tracks_received = 0;
       $('#album_list').html("");
       $('#artist_name').html("");
     }
-// This funtion display Artist Infomation on Success
+    // This funtion display Artist Infomation on Success
     function displayArtistInfo() {
 
       // clear all <p>aragraphs before
@@ -165,7 +173,7 @@
 
       // $("#track_list").html(response.data[0].tracklist);
       for (var i = 0; i < album_list.length; i++) {
-        $('#album_list').append('<div class="card border-secondary mb-3" style="width: 251px;"><img src="'+album_list[i].cover_medium+'"/><h5 class="card-title">' + album_list[i].title + '</h5><ol id="'+album_list[i].id+'"></ol></div>');
+        $('#album_list').append('<div class="card border-secondary mb-3 album-card"><img class="card-img" src="' + album_list[i].cover_medium + '"/><h5 class="card-title">' + album_list[i].title + '</h5><ol id="' + album_list[i].id + '"></ol></div>');
       }
     }
 
@@ -200,4 +208,5 @@
     });
   </script>
 </body>
+
 </html>
